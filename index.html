@@ -122,7 +122,6 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker top           <span class="comment">#查看容器内部的进程</span></span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker cp            <span class="comment">#将文件拷贝到主机上</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker commit        <span class="comment">#创建一个新的镜像</span></span> </span><br></pre></td></tr></table></figure>
-
 <p><img src="/2021/04/23/docker/3.png"></p>
 <h3 id="Volumes"><a href="#Volumes" class="headerlink" title="Volumes"></a>Volumes</h3><p>docker的卷技术，将容器的目录挂载在Linux下。一句话：容器的持久化与同步操作。</p>
 <h4 id="具名挂载和匿名挂载"><a href="#具名挂载和匿名挂载" class="headerlink" title="具名挂载和匿名挂载"></a>具名挂载和匿名挂载</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 匿名挂载</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -d --name nginx -v /etc/nginx nginx</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">查看数据卷列表</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker volume ls</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">具名挂载</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -d --name nginx -v aNam_nginx:/etc/nginx nginx</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">查看具体的数据卷</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker volume inspect aNam_nginx</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash">删除数据卷</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker volume rm aNam_nginx</span></span><br></pre></td></tr></table></figure>
@@ -141,7 +140,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/04/23/docker/" data-id="cknuf8lzt000080tj9n2417sr" data-title="docker" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2021/04/23/docker/" data-id="cknugju4q000080tj3ovegs0c" data-title="docker" class="article-share-link">Share</a>
       
       
       
@@ -192,7 +191,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/04/22/hello-world/" data-id="cknuf8lzy000180tjcfqo37bd" data-title="Hello World" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2021/04/22/hello-world/" data-id="cknugju4u000180tj5y218lrj" data-title="Hello World" class="article-share-link">Share</a>
       
       
       
@@ -289,5 +288,5 @@
 
 
   </div>
-</body>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"live2d-widget-model-haruto"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
