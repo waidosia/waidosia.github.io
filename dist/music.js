@@ -15,7 +15,7 @@ const ap = new APlayer({
         {
             name: '十一年',
             artist: '邱永传',
-            url: 'https://m10.music.126.net/20210429001102/3c97b55748362f51b617ca549901d474/ymusic/7104/8547/3e3c/27dfbd02d15d68648222eb32f6331e64.mp3',
+            url: 'http://www.ytmp3.cn/down/59635.mp3',
             cover: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fweiyinyue.music.sina.com.cn%2Fwpp_cover%2F100044327_300300.jpg&refer=http%3A%2F%2Fweiyinyue.music.sina.com.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1622197367&t=4c64f5957b4811251ca4a1f0bf4efaff',
         },
         {
