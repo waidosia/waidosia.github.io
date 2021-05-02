@@ -9,7 +9,7 @@ const ap = new APlayer({
         {
             name: '多幸运',
             artist: '韩安旭',
-            url: '3548771471.mp3',
+            url: 'source/3548771471.mp3',
             cover: 'https://y.gtimg.cn/music/photo_new/T002R300x300M0000008wVjT0MSG3T_1.jpg?max_age=2592000',
             lrc: '多幸运-Vk.lrc'
         },
