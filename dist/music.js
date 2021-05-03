@@ -10,9 +10,9 @@ const ap = new APlayer({
         {
             name: '晴天',
             artist: '周杰伦',
-            url: 'source/晴天.mp3',
-            cover: 'images/晴天.jpg',
-            lrc: 'lrc/晴天.lrc'
+            url: '/source/晴天.mp3',
+            cover: '/images/晴天.jpg',
+            lrc: '/lrc/晴天.lrc'
         },
         {
             name: '告白气球',
