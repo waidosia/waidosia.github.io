@@ -5,6 +5,7 @@ const ap = new APlayer({
     volume: 0.7,
     listFolded: true,
     listMaxHeight: 60,
+    lrcType: 3,
     audio: [
         {
             name: '晴天',
