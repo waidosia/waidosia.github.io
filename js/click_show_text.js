@@ -1,4 +1,5 @@
 var a_idx = 0;
+<script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
 jQuery(document).ready(function($) {
     $("body").click(function(e) {
         var a = new Array
