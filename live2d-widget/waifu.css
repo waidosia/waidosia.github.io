@@ -26,7 +26,7 @@
 	bottom: -1000px;
 	left: 0;
 	line-height: 0;
-	margin-bottom: -10px;
+	margin-bottom: 5px;
 	position: fixed;
 	transform: translateY(3px);
 	transition: transform .3s ease-in-out, bottom 3s ease-in-out;
@@ -68,9 +68,9 @@
 
 #waifu #live2d {
 	cursor: grab;
-	height: 300px;
+	height: 250px;
 	position: relative;
-	width: 300px;
+	width: 250px;
 }
 
 #waifu #live2d:active {
