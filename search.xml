@@ -1,12 +1,751 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>MongoDB</title>
+    <url>/2021/05/16/mongodb/</url>
+    <content><![CDATA[<h3 id="管理逻辑库"><a href="#管理逻辑库" class="headerlink" title="管理逻辑库"></a>管理逻辑库</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 创建<span class="operator">/</span>切换逻辑库</span><br><span class="line">use test;</span><br><span class="line"># 查看逻辑库</span><br><span class="line"><span class="keyword">show</span> dbs</span><br><span class="line"># 删除逻辑库</span><br><span class="line">db.dropDatabase(``)</span><br></pre></td></tr></table></figure>
+<h3 id="管理集合"><a href="#管理集合" class="headerlink" title="管理集合"></a>管理集合</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 创建集合</span><br><span class="line">db.createCollection(&quot;student&quot;)</span><br><span class="line"># 查看集合</span><br><span class="line"><span class="keyword">show</span> collections</span><br><span class="line"># 删除集合</span><br><span class="line">db.student.drop()</span><br><span class="line"># 查看集合记录数量</span><br><span class="line">db.student.<span class="built_in">count</span>()</span><br><span class="line"># 查看数据空间容量</span><br><span class="line">db.student.dataSize()</span><br><span class="line">#重命名集合</span><br><span class="line">db.student.renameCollection(&quot;Stu&quot;)</span><br></pre></td></tr></table></figure>
+<h3 id="添加记录"><a href="#添加记录" class="headerlink" title="添加记录"></a>添加记录</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">db.student.save(</span><br><span class="line">    [</span><br><span class="line">        &#123;name,&quot;李强&quot;,sex:&quot;男&quot;,age:24&#125;,</span><br><span class="line">        &#123;name,&quot;刘倩&quot;,sex:&quot;女&quot;,age:23&#125;,</span><br><span class="line">        &#123;name,&quot;赵婷婷&quot;,sex:&quot;女&quot;,age:24&#125;,</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><p><strong>主键值:数据库会自动添加主键，是一个12字节的bson类型字符串(主机名、进程id、时间戳等等)</strong></p>
+<p><strong>时间戳:数据库存储的日期会自动转化成格林尼治时间</strong></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 提取主键里的时间戳</span><br><span class="line"><span class="operator">&gt;</span> objectId(&quot;****&quot;).gerTimestamp()</span><br><span class="line"><span class="operator">&gt;</span> ISODate(&quot;&quot;)</span><br><span class="line">#查询语句</span><br><span class="line">db.student.find();</span><br><span class="line">db.student.find(&#123;name:&quot;李强&quot;,sex:&quot;男&quot;&#125;);</span><br><span class="line">db.student.find(&#123;sex:&quot;女&quot;,age:&#123;$gte:20&#125;&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>MongoDB的表达式必须是JSON格式<br>| 表达式 | 意义 | 表达式 | 意义 |<br>| :—: | :—: | :—: | :—: |<br>| $lt | 小于 | $gt | 大于 |<br>| $lte | 小于等于 | $gte | 大于等于 |<br>| $in | 包括 | $nin | 不包括 |<br>| $ne | 不等于 | $all | 全部 |<br>| $not | 全部 | $or | 或关系 |<br>| $exists | 含有关系 |</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">use school</span><br><span class="line">db.student.find(&#123;age:&#123;$gte:20,$lte:30&#125;&#125;)</span><br><span class="line">db.student.find(&#123;city:&#123;$in:[&quot;苏州市&quot;,&quot;大连市&quot;]&#125;&#125;)</span><br><span class="line">db.student.find(&#123;name:&#123;$ne:&quot;李强&quot;&#125;&#125;)</span><br><span class="line">db.teacher.find(&#123;role:&#123;$all:[&quot;班主任&quot;,&quot;年级主任&quot;]&#125;&#125;)</span><br><span class="line">db.student.find(&#123;age:&#123;$not:&#123;$gte:28,$lte30&#125;&#125;&#125;)</span><br><span class="line">db.student.find(&#123;$or:[&#123;age:&#123;$lt:30&#125;,age:&quot;男&quot;&#125;,&#123;age:&#123;$lt:25&#125;,age:&quot;女&quot;&#125;])</span><br><span class="line">db.student.find(&#123;age:&#123;$exists:1&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>MongoDB支持正则表达式查找内容</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">db.student.find(&#123;name:/^李/&#125;)</span><br><span class="line">db.student.find(&#123;name:/^[a-zA-Z]&#123;2,10&#125;$/&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="分页查找数据"><a href="#分页查找数据" class="headerlink" title="分页查找数据"></a>分页查找数据</h3><p>可以使用skip()函数设置起始量,limit()函数设置偏移量</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">db.student.find(&#123;&#125;).limit(10);</span><br><span class="line">db.student.find(&#123;&#125;).skip(20).limit(10);</span><br></pre></td></tr></table></figure>
+<h3 id="数据排序"><a href="#数据排序" class="headerlink" title="数据排序"></a>数据排序</h3><p>使用sort()函数排序，1代表升序，-1代表降序</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">db.student.find().sort(&#123;name:1&#125;)</span><br><span class="line">db.student.find().sort(&#123;name:1&#125;).skip(10).limit(10)</span><br></pre></td></tr></table></figure>
+<h3 id="排除重复"><a href="#排除重复" class="headerlink" title="排除重复"></a>排除重复</h3><p>使用distinct()函数来替换不重复的记录</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">db.student.distinct(&quot;name&quot;)</span><br><span class="line"># 由于返回的是js的数组格式</span><br><span class="line"># 降序排序</span><br><span class="line">db.student.distinct(&quot;name&quot;).srot(function()&#123;return -1&#125;)</span><br><span class="line"># 分页查询</span><br><span class="line">db.student.distinct(&quot;name&quot;).slice(<span class="number">0</span>,<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="修改记录"><a href="#修改记录" class="headerlink" title="修改记录"></a>修改记录</h3><p>update()和updateMany()函数实现对数据的修改</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line"># 格式</span><br><span class="line">db.collection.updateMany(&#123;condition,&#123;$set:&#123;data&#125;&#125;&#125;)</span><br><span class="line"># 举例</span><br><span class="line">db.student.update(&#123;name:&quot;李强&quot;,&#123;$set:&#123;age:26,classno:&quot;2-6&quot;&#125;&#125;&#125;)</span><br><span class="line">db.student.update(&#123;name:&quot;李强&quot;,&#123;$set:&#123;age:26&#125;&#125;,&#123;$set:&#123;classno:&quot;2-6&quot;&#125;&#125;&#125;)</span><br><span class="line"># $unset :删除记录的字段</span><br><span class="line">db.student.updateMany(&#123;&#125;,&#123;$unset:&#123;city:1,tel:1&#125;&#125;)</span><br><span class="line"># $inc :对某个字段做加法运算</span><br><span class="line">db.student.updateMany(&#123;&#125;,&#123;$inc:&#123;age:2&#125;&#125;&#125;</span><br><span class="line"># $push :向数组元素添加元素</span><br><span class="line">db.student.update(&#123;name:&quot;Jack&quot;&#125;,&#123;$push:&#123;role:&quot;教务主任&quot;&#125;&#125;)</span><br><span class="line"># $pull :删除数组的元素</span><br><span class="line">db.student.update(&#123;name:&quot;Jack&quot;&#125;,&#123;$pull:&#123;role:&quot;教务主任&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="删除记录"><a href="#删除记录" class="headerlink" title="删除记录"></a>删除记录</h3><p>remove()函数删除记录</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">db.student.remove(&#123;&#125;)</span><br><span class="line">db.student.remove(&#123;class:&quot;6-2&quot;,sex:&quot;男&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="索引机制"><a href="#索引机制" class="headerlink" title="索引机制"></a>索引机制</h3><p>因为数据库存放大量的数据，所以为了加快数据检索速度，需要设置索引<br>索引字段按照升序排列，属性值为1;降序排列属性值为-1<br>创建索引会阻塞数据库，影响其他操作，所以background参数代表在空闲的时间创建索引</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 格式</span><br><span class="line">db.collection.createIndex(&#123;keys:1&#125;,options)</span><br><span class="line"># 创建索引</span><br><span class="line">db.student.createIndex(&#123;name:1&#125;)</span><br><span class="line"># 删除单个索引</span><br><span class="line">db.student.dropIndex(&#123;name&#125;)</span><br><span class="line"># 删除所有索引</span><br><span class="line">db.student.dropIndexes()</span><br><span class="line"># 空闲时间创建</span><br><span class="line">db.student.createIndex(&#123;name:1&#125;，&#123;background:true&#125;)</span><br><span class="line"># 获取索引</span><br><span class="line">db.student.getIndexes()</span><br></pre></td></tr></table></figure>
+<p>唯一性索引只能创建在每个记录都含有的公共字段上，非公共字段不能创建唯一性索引</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">db.student.createIndex(&#123;sid:1&#125;,&#123;background:true,unique:true,name:sid&#125;)</span><br></pre></td></tr></table></figure>
+<p>创建索引的原则</p>
+<ul>
+<li>数据量恒大的集合必须创建索引</li>
+<li>集合的数据读取超过写入</li>
+<li>经常被当做查询条件的字段</li>
+</ul>
+<h3 id="数据的导入与导出"><a href="#数据的导入与导出" class="headerlink" title="数据的导入与导出"></a>数据的导入与导出</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># mongoexport命令可以把一个集合的数据导出为json或csv格式的文件</span><br><span class="line">mongoexport <span class="comment">--host=localhost --port=27017 -u admin </span></span><br><span class="line"><span class="operator">-</span>p CZ200<span class="number">.07</span><span class="number">.16</span> <span class="comment">--authenticationDatabase=admin -d school </span></span><br><span class="line"><span class="operator">-</span>c student <span class="operator">-</span>f &quot;_id,name,sex,age&quot; <span class="operator">-</span>o D:<span class="operator">/</span>student.json</span><br><span class="line"># mongoimport命令可以把JSON或者CSV文件的数据导入到某个集</span><br><span class="line">合中</span><br><span class="line">mongoimport <span class="comment">--host=localhost --port=27017 -u admin </span></span><br><span class="line"><span class="operator">-</span>p CZ200<span class="number">.07</span><span class="number">.16</span> <span class="comment">--authenticationDatabase=admin -d test </span></span><br><span class="line"><span class="operator">-</span>c student <span class="comment">--file D:/student.json</span></span><br><span class="line"># mongodump命令可以导出逻辑库的数据</span><br><span class="line">mongodump <span class="comment">--host=localhost --port=27017 -u admin </span></span><br><span class="line"><span class="operator">-</span>p CZ200<span class="number">.07</span><span class="number">.16</span> <span class="comment">--authenticationDatabase=admin -d school </span></span><br><span class="line"><span class="operator">-</span>o D:<span class="operator">/</span></span><br><span class="line"># <span class="comment">--dumpDbUsersAndRoles参数可以备份隶属于逻辑库的用户</span></span><br><span class="line"># mongorestore命令可以把导出的数据导入到逻辑库中</span><br><span class="line">mongorestore <span class="comment">--host=localhost --port=27017 -u admin </span></span><br><span class="line"><span class="operator">-</span>p CZ200<span class="number">.07</span><span class="number">.16</span> <span class="comment">--authenticationDatabase=admin --drop -d </span></span><br><span class="line">school D:<span class="operator">/</span>school</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>study</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis</title>
+    <url>/2021/05/16/redis/</url>
+    <content><![CDATA[<h2 id="Redis的五种数据类型"><a href="#Redis的五种数据类型" class="headerlink" title="Redis的五种数据类型"></a>Redis的五种数据类型</h2><ul>
+<li>字符串<ul>
+<li>String类型既可以保存普通文字，也可以保存序列化的二进制数据。</li>
+<li>String类型最大可以存储512M数据<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 设置键值对</span></span><br><span class="line">redis &gt; SET emile scott@163.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取值</span></span><br><span class="line">redis &gt; GET emile</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除键</span></span><br><span class="line">redis &gt; DEL emile</span><br><span class="line"><span class="meta">#</span><span class="bash"> 截取字符串内容 键 起始位置 终止位置(都闭合)</span></span><br><span class="line">redis &gt; GETRANGE emile 0 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取字符串的长度</span></span><br><span class="line">redis &gt; STRLEN emile</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置带有过期时间的键值对(秒)</span></span><br><span class="line">redis &gt; SETEX city 5 BeiJing</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置多个键值对</span></span><br><span class="line">redis &gt; MSET username scott sex male</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得多个值</span></span><br><span class="line">redis &gt; username sex</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在字符串尾追加命令</span></span><br><span class="line">redis &gt; SET temp ABCD</span><br><span class="line">redis &gt; APPEND temp 1234</span><br><span class="line"><span class="meta">#</span><span class="bash"> 字符串数据加减运算(所有减法均可通过加负数实现)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数字加1/减1</span></span><br><span class="line">redis &gt; INCR num</span><br><span class="line">redis &gt; DECR num</span><br><span class="line"><span class="meta">#</span><span class="bash"> 数字加上指定整数/减去指定整数</span></span><br><span class="line">redis &gt; INCRBY  num 25</span><br><span class="line">redis &gt; DECR num 25</span><br><span class="line"><span class="meta">#</span><span class="bash"> 数字加上指定浮点数(不支持减，可以通过加负数)</span></span><br><span class="line">redis &gt; INCRBYFLOAT num 3.5</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>哈希<ul>
+<li>使用哈希类型保存更复杂的结构化数据<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 设置哈希表字段</span> </span><br><span class="line">redis &gt; HSET 8000 ename Tom</span><br><span class="line">redis &gt; HSET 8000 job SAL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置哈希表多个字段</span></span><br><span class="line">redis &gt; HMSET 8000 ename Tom job SAL deptno 10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得哈希表字段值</span></span><br><span class="line">redis &gt; HGET 8000 ename</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得哈希表多个字段</span></span><br><span class="line">redis &gt; HMGET 8000 ename job deptno</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得所有的字段值</span></span><br><span class="line">redis &gt; HGETALL 8000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得哈希表的字段名</span></span><br><span class="line">redis &gt; HKEYS 8000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得哈希表字段数量</span></span><br><span class="line">redis &gt; HLEN 8000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 判断哈希表是否存在某个字段</span></span><br><span class="line">redis &gt; HEXISTS 8000 job</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得哈希表的所有字段值</span></span><br><span class="line">redis &gt; HVALS 8000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除哈希表的字段</span></span><br><span class="line">redis &gt; HDEL 8000 job deptno</span><br><span class="line"><span class="meta">#</span><span class="bash"> 哈希表某个字段加上指定整数(减法通过加负数实现)</span></span><br><span class="line">redis &gt; HINCRBY 8000 deptno 10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 哈希表某个字段加上指定浮点数</span></span><br><span class="line">redis &gt; HINCRBYFLOAT 8000 deptno 10.5</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>列表<ul>
+<li>列表类型用来保存序列化的数据</li>
+<li>元素可以重复<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 列表右侧插入数据</span></span><br><span class="line">redis &gt; RPUSH dname 技术部 后勤部</span><br><span class="line"><span class="meta">#</span><span class="bash"> 列表左侧插入数据</span></span><br><span class="line">redis &gt; LPUSH dname 秘书处</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改元素值</span></span><br><span class="line">redis &gt; LSET dname 2 销售部</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示列表的值 0:第一个元素 -1:最后一个元素</span></span><br><span class="line">redis &gt; LRANGE dname 0 -1  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得列表长度</span></span><br><span class="line">redis &gt; LLEN dname</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得列表某个元素(索引)</span></span><br><span class="line">redis &gt; LINDEX dname 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 插入元素(后一个元素名称) (插入元素名称)</span></span><br><span class="line">redis &gt; LINSERT dname BEFORE 秘书处 董事会</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除最左边元素</span></span><br><span class="line">redis &gt; LPOP dname</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除最右边元素</span></span><br><span class="line">redis &gt; RPOP dname</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除某个元素 [第几个元素] (传入元素值)</span></span><br><span class="line">redis &gt; LREM dname 技术部</span><br><span class="line">redis &gt; LREM dname 1 技术部</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>集合<ul>
+<li>类似于列表，但是不允许重复元素</li>
+<li>以哈希形式存储在内存中<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 添加元素</span></span><br><span class="line">redis &gt; SADD empno 8000 8001 8002</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看集合内的元素(乱序)</span></span><br><span class="line">redis &gt; SMEMBERS empno </span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得集合长度</span></span><br><span class="line">redis &gt; SCARD empno</span><br><span class="line"><span class="meta">#</span><span class="bash"> 判断某个元素是否存在</span></span><br><span class="line">redis &gt; SISMEMBER empno 8000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除元素(不写索引写值)</span></span><br><span class="line">redis &gt; SERM empno 8000 8001</span><br><span class="line"><span class="meta">#</span><span class="bash"> 随机删除并返回集合的某个元素</span></span><br><span class="line">redis &gt; SPOP empno</span><br><span class="line"><span class="meta">#</span><span class="bash"> 随机返回集合中的元素(返回的个数)</span></span><br><span class="line">redis &gt; SRANDMEMBER empno 5</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>有序集合<ul>
+<li>有序集合是带有排序功能的集合，redis会按照元素分数值排序<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 新建元素(分数值)(元素名)</span></span><br><span class="line">redis &gt; ZADD keyword 0 &quot;鹿晗&quot; 0 &quot;马云&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 增加元素分数</span></span><br><span class="line">redis &gt; ZINCRBY keyword 1 &quot;鹿晗&quot;</span><br><span class="line">redis &gt; ZINCRBY keyword 5 &quot;马云&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 返回降序排序结果</span></span><br><span class="line">redis &gt; ZREVRANGE keyword 0 -1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 返回升序结果</span></span><br><span class="line">redis &gt; ZRANGE keyword 0 -1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得有序集合的长度</span> </span><br><span class="line">redis &gt; ZCARD keyword</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询某个分数值区间内的元素数量</span></span><br><span class="line">redis &gt; ZCOUNT keyword 5 10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 返回元素的分数值</span></span><br><span class="line">redis &gt; ZSCORE keyword &quot;马云&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得某个分数值区间的集合内容(升序),加(包括不包含</span></span><br><span class="line">redis &gt; ZRANGEBYSCORE keyword 5 10</span><br><span class="line">redis &gt; ZRANGEBYSCORE keyword 5 (10</span><br><span class="line">redis &gt; ZRANGEBYSCORE keyword 1000 +inf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得某个分数值区间的集合内容(降序)</span></span><br><span class="line">redis &gt; ZREVRANGEBYSCORE keyword 10 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得元素的升序排名(起始为0)</span></span><br><span class="line">redis &gt; ZRANK keyword &quot;马云&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获得元素的降序排名(起始为0)</span></span><br><span class="line">redis &gt; ZREVRANK keyword &quot;马云&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除有序集合中的元素</span></span><br><span class="line">redis &gt; ZREM keyword &quot;马云&quot; &quot;鹿晗&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除排名区间内的元素</span></span><br><span class="line">redis &gt; ZREMRANGEBYRANK keyword 0 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除分数值区间内的元素</span></span><br><span class="line">redis &gt; ZREMRANGBYSCORE keyword -inf (5000</span><br></pre></td></tr></table></figure>
+<hr></li>
+</ul>
+</li>
+</ul>
+<h3 id="key-命令"><a href="#key-命令" class="headerlink" title="key 命令"></a>key 命令</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 删除记录</span></span><br><span class="line">redis &gt; DEL keyword</span><br><span class="line"><span class="meta">#</span><span class="bash"> 判断是否存在某个key</span></span><br><span class="line">redis &gt; EXISTS keyword</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置过期时间</span></span><br><span class="line">redis &gt; EXPIRE keyword 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置过期时间(时间戳)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 转化工具https://tool.chinaz.com/tools/unixtime.aspx</span></span><br><span class="line">redis &gt; EXPIREAT  keyword 1544803200</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把记录迁移到其他逻辑库</span></span><br><span class="line">redis &gt; MOVE keyword 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改key名称</span></span><br><span class="line">redis &gt; RENAME keyword tmp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 移除过期时间</span></span><br><span class="line">redis &gt; PERSIST keyword</span><br><span class="line"><span class="meta">#</span><span class="bash"> 判断VALUE数据类型</span></span><br><span class="line">redis &gt;TYPE keyword</span><br></pre></td></tr></table></figure>
+<h3 id="事务机制"><a href="#事务机制" class="headerlink" title="事务机制"></a>事务机制</h3><p>防止并发执行其他操作插队的。<br>事务的特点：</p>
+<ul>
+<li>一致性</li>
+<li>隔离性<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">开始事务前用WATCH监视要操作的记录</span></span><br><span class="line">redis &gt; WATCH kill_num kill_user</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启事务</span></span><br><span class="line">redis &gt; MULTI</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启事务后，所有操作不会立马执行，等到EXEC命令后进行批处理</span></span><br><span class="line">redis &gt; INCR kill_num</span><br><span class="line">redis &gt; RPUSH kill_user 9502</span><br><span class="line">redis &gt;EXEC</span><br><span class="line"><span class="meta">#</span><span class="bash"> 事务的取消</span></span><br><span class="line">redis &gt; DISCARD</span><br></pre></td></tr></table></figure>
+<h3 id="redis命令文档"><a href="#redis命令文档" class="headerlink" title="redis命令文档"></a>redis命令文档</h3><a href="http://doc.redisfans.com/index.html">http://doc.redisfans.com/index.html</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>study</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git</title>
+    <url>/2021/05/16/git/</url>
+    <content><![CDATA[<h2>Git的概念</h2>
+
+<ul>
+<li><p>Git 是一个免费的开源 分布式版本控制系统，旨在快速高效地处理从小型到大型项目的所有内容。（官方定义）</p>
+</li>
+<li><p>简单点就是：Git 是目前世界上最先进的分布式版本控制系统（没有之一）。</p>
+</li>
+<li><p>Git 有什么特点？简单来说就是：高端大气上档次！</p>
+</li>
+</ul>
+<h2 id="Linux-下的安装、命令行的使用"><a href="#Linux-下的安装、命令行的使用" class="headerlink" title="Linux 下的安装、命令行的使用"></a>Linux 下的安装、命令行的使用</h2><h4>Git的安装</h4>
+
+<p>在使用 Git 前我们需要先安装 Git。Git 目前支持所有的主流平台上运行。</p>
+<p>Git 各平台安装包下载地址为：<a href="http://git-scm.com/downloads">http://git-scm.com/downloads</a></p>
+<p>Ubuntu 通过： sudo apt-get install git 进行安装</p>
+<p>在命令行输入 git 测试是否安装成功</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ebby@eddy-virtual-machine:~$ git</span><br><span class="line">usage: git [--version] [--help] [-C &lt;path&gt;] [-c &lt;name&gt;&#x3D;&lt;value&gt;]</span><br><span class="line">           [--exec-path[&#x3D;&lt;path&gt;]] [--html-path] [--man-path] [--info-path]</span><br><span class="line">           [-p | --paginate | --no-pager] [--no-replace-objects] [--bare]</span><br><span class="line">           [--git-dir&#x3D;&lt;path&gt;] [--work-tree&#x3D;&lt;path&gt;] [--namespace&#x3D;&lt;name&gt;]</span><br><span class="line">           &lt;command&gt; [&lt;args&gt;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4>Git的配置</h4>
+
+<p>Git 提供了一个叫做 git config 的工具，专门用来配置或读取相应的工作环境变量。</p>
+<ul>
+<li><p>配置用户信息</p>
+<ul>
+<li>```<br>$ git config –global user.name “eddy”<br>$ git config –global user.email <a href="mailto:&#x63;&#49;&#55;&#x37;&#x78;&#x78;&#x78;&#x78;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;">&#x63;&#49;&#55;&#x37;&#x78;&#x78;&#x78;&#x78;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;</a><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">- 配置文本编辑器</span><br><span class="line"></span><br><span class="line">  - &#96;&#96;&#96;</span><br><span class="line">    $ git config --global core.editor nano</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>配置差异分析工具</p>
+<ul>
+<li>```<br>$ git config –global merge.tool vimdiff<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">- 查看配置信息</span><br><span class="line"></span><br><span class="line">  - &#96;&#96;&#96;</span><br><span class="line">    $ git config --list</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h4>Git基本操作</h4>
+
+<p><img src="/2021/05/16/git/4.jpg" alt="img"></p>
+<pre><code>    - Workspace：工作区
+    - Index / Stage：暂存区
+    - Repository：仓库区（或本地仓库）
+    - Remote：远程仓库
+</code></pre>
+<h4>Git创建仓库</h4>
+
+<ul>
+<li>​ Git 使用 <strong>git init</strong> 命令来初始化一个 Git 仓库，Git 的很多命令都需要在 Git 的仓库中运行，所以 <strong>git init</strong> 是使用 Git 的第一个命令。在执行完成 <strong>git init</strong> 命令后，Git 仓库会生成一个 .git 目录，该目录包含了资源的所有元数据，其他的项目目录保持不变。</li>
+</ul>
+<p><img src="/2021/05/16/git/2.png" alt="image-20210119111547893"></p>
+<ul>
+<li>​ Git 克隆：使用 <strong>git clone</strong>拷贝一份远程仓库，也就是下载一个项目。</li>
+</ul>
+<p><img src="/2021/05/16/git/4.png" alt="4"></p>
+<h4 id="Git-基本操作"><a href="#Git-基本操作" class="headerlink" title="Git 基本操作"></a>Git 基本操作</h4><ul>
+<li><p>​ 如果当前目录下有几个文件想要纳入版本控制，需要先用 <strong>git add</strong> 命令将文件存入缓存区</p>
+</li>
+<li><p>​ 再通过<strong>git commit</strong> 将缓存区的内容存入本地仓库中</p>
+</li>
+</ul>
+<p><img src="/2021/05/16/git/3.png" alt="3"></p>
+<ul>
+<li><p><strong>git status</strong>查看仓库当前的状态，显示有变更的文件。</p>
+</li>
+<li><p><strong>git diff</strong>比较暂存区与工作区的差异</p>
+</li>
+</ul>
+<p><img src="/2021/05/16/git/5.png"></p>
+<ul>
+<li><p><strong>git rm</strong> 删除工作区的文件</p>
+</li>
+<li><p><strong>git mv</strong> 移动或者重命名文件</p>
+</li>
+</ul>
+<p><img src="/6.png"></p>
+<h4 id="git-查看日志"><a href="#git-查看日志" class="headerlink" title="git 查看日志"></a>git 查看日志</h4><ul>
+<li><p><strong>git log</strong> 查看历史提交记录</p>
+<ul>
+<li>–oneline:历史记录的简洁的版本</li>
+<li>–graph:查看历史中什么时候出现了分支、合并</li>
+<li>–reverse:逆向显示所有日志</li>
+</ul>
+</li>
+<li><p><strong>git blame</strong> <file> 查看指定文件的历史修改记录</file></p>
+<p><img src="/7.png" alt="image-20210119175316426"></p>
+</li>
+</ul>
+<h4 id="git-分支管理"><a href="#git-分支管理" class="headerlink" title="git 分支管理"></a>git 分支管理</h4><p>​</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#列出分支</span><br><span class="line">$git branch</span><br><span class="line"></span><br><span class="line">#新建分支</span><br><span class="line">$git branch (分支名)</span><br><span class="line"></span><br><span class="line">#切换分支</span><br><span class="line">$git checkout (分支名)</span><br><span class="line">$git checkout -</span><br><span class="line"></span><br><span class="line">#合并分支</span><br><span class="line">$git merge (分支名)</span><br><span class="line"></span><br><span class="line">#删除分支</span><br><span class="line">$git branch -d (分支名)</span><br><span class="line"></span><br><span class="line">#分支冲突</span><br><span class="line">在合并时系统会做出提示，这时需要手动去处理，处理后通过add告诉系统已处理完成。</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/05/16/git/8.png"></p>
+<h4>Git标签</h4>
+
+<ul>
+<li>​ 用 git tag -a v1.0 命令给最新一次提交打上”v1.0”的标签。</li>
+</ul>
+<h4 id="Git-Gitee"><a href="#Git-Gitee" class="headerlink" title="Git Gitee"></a>Git Gitee</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#本地库上使用命令 git remote add 把它和 Gitee 的远程库关联</span><br><span class="line">$git remote add origin git@gitee.com:imnoob&#x2F;runoob-test.git</span><br><span class="line"></span><br><span class="line">#查看远程库信息</span><br><span class="line">$git remote -v</span><br><span class="line"></span><br><span class="line">#送到 Gitee</span><br><span class="line">$git push origin master</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/05/16/git/10.png"></p>
+<p><img src="/2021/05/16/git/11.png"></p>
+<hr>
+<h2>git flow的应用</h2>
+
+<p>​ 为解决开发过程中缺乏清晰地流程与规范而提出的一种解决方案。</p>
+<img src="/2021/05/16/git/13.png" alt="img" style="zoom: 33%;">
+
+<h2 id="Git-Flow-的常用分支"><a href="#Git-Flow-的常用分支" class="headerlink" title="Git Flow 的常用分支"></a>Git Flow 的常用分支</h2><img src="/2021/05/16/git/12.png" style="zoom: 200%;">
+
+<h2 id="Git-Flow-的使用"><a href="#Git-Flow-的使用" class="headerlink" title="Git Flow 的使用"></a>Git Flow 的使用</h2><ul>
+<li><p>Master/Devlop 分支：所有在 Master 分支上的 Commit 应该打上 Tag，一般情况下 Master 不存在 Commit，Devlop 分支基于 Master 分支创建</p>
+</li>
+<li><p>Feature 分支：Feature 分支做完后，必须合并回 Develop 分支, 合并完分支后一般会删点这个 Feature 分支，毕竟保留下来意义也不大。</p>
+</li>
+<li><p>Release 分支：Release 分支基于 Develop 分支创建，打完 Release 分支之后，我们可以在这个 Release 分支上测试，修改 Bug 等。同时，其它开发人员可以基于 Develop 分支新建 Feature (记住：一旦打了 Release 分支之后不要从 Develop 分支上合并新的改动到 Release 分支)发布 Release 分支时，合并 Release 到 Master 和 Develop， 同时在 Master 分支上打个 Tag 记住 Release 版本号，然后可以删除 Release 分支了。</p>
+</li>
+<li><p>Hotfix 分支：hotfix 分支基于 Master 分支创建，开发完后需要合并回 Master 和 Develop 分支，同时在 Master 上打一个 tag。</p>
+<h2 id="Git-Flow-命令示例"><a href="#Git-Flow-命令示例" class="headerlink" title="Git Flow 命令示例"></a>Git Flow 命令示例</h2><h3 id="创建-Devlop"><a href="#创建-Devlop" class="headerlink" title="创建 Devlop"></a>创建 Devlop</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git branch develop</span><br><span class="line">git push -u origin develop</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始-Feature"><a href="#开始-Feature" class="headerlink" title="开始 Feature"></a>开始 Feature</h3><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta"># 通过develop新建feaeure分支</span></span><br><span class="line">git checkout -b feature develop</span><br><span class="line"><span class="meta"># 或者, 推送至远程服务器:</span></span><br><span class="line">git push -u origin feature</span><br><span class="line"></span><br><span class="line"><span class="meta"># 修改md文件</span></span><br><span class="line">git status</span><br><span class="line">git <span class="keyword">add</span> .</span><br><span class="line">git commit</span><br></pre></td></tr></table></figure>
+
+<h3 id="完成-Feature"><a href="#完成-Feature" class="headerlink" title="完成 Feature"></a>完成 Feature</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull origin develop</span><br><span class="line">git checkout develop</span><br><span class="line"></span><br><span class="line"><span class="comment">#--no-ff：不使用fast-forward方式合并，保留分支的commit历史</span></span><br><span class="line"><span class="comment">#--squash：使用squash方式合并，把多次分支commit历史压缩为一次</span></span><br><span class="line"></span><br><span class="line">git merge --no-ff feature</span><br><span class="line">git push origin develop</span><br><span class="line"></span><br><span class="line">git branch -d some-feature</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果需要删除远程feature分支:</span></span><br><span class="line">git push origin --delete feature</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始-Release"><a href="#开始-Release" class="headerlink" title="开始 Release"></a>开始 Release</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout -b release-0.1.0 develop</span><br></pre></td></tr></table></figure>
+
+<h3 id="完成-Release"><a href="#完成-Release" class="headerlink" title="完成 Release"></a>完成 Release</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git merge --no-ff release-0.1.0</span><br><span class="line">git push</span><br><span class="line"></span><br><span class="line">git checkout develop</span><br><span class="line">git merge --no-ff release-0.1.0</span><br><span class="line">git push</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git branch -d release-0.1.0</span><br><span class="line">git push origin --delete release-0.1.0</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合并master/devlop分支之后，打上tag</span></span><br><span class="line">git tag -a v0.1.0 master</span><br><span class="line">git push --tags</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始-Hotfix"><a href="#开始-Hotfix" class="headerlink" title="开始 Hotfix"></a>开始 Hotfix</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout -b hotfix-0.1.1 master</span><br></pre></td></tr></table></figure>
+
+<h3 id="完成-Hotfix"><a href="#完成-Hotfix" class="headerlink" title="完成 Hotfix"></a>完成 Hotfix</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git merge --no-ff hotfix-0.1.1</span><br><span class="line">git push</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git checkout develop</span><br><span class="line">git merge --no-ff hotfix-0.1.1</span><br><span class="line">git push</span><br><span class="line"></span><br><span class="line">git branch -d hotfix-0.1.1</span><br><span class="line">git push origin --delete  hotfix-0.1.1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git tag -a v0.1.1 master</span><br><span class="line">git push --tags</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>编程</category>
+      </categories>
+      <tags>
+        <tag>study</tag>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySql</title>
+    <url>/2021/05/16/mysql/</url>
+    <content><![CDATA[<h3 id="SQL语句的注释"><a href="#SQL语句的注释" class="headerlink" title="SQL语句的注释"></a>SQL语句的注释</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">#这是注释</span><br><span class="line"><span class="comment">/* 这是注释 */</span></span><br></pre></td></tr></table></figure>
+<h3 id="创建逻辑库"><a href="#创建逻辑库" class="headerlink" title="创建逻辑库"></a>创建逻辑库</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 逻辑库名称;     # 创建逻辑库</span><br><span class="line"><span class="keyword">SHOW</span> DATABASES;               # 显示所有逻辑库</span><br><span class="line"><span class="keyword">DROP</span> DATABASE 逻辑库名称;       #删除指定逻辑库</span><br></pre></td></tr></table></figure>
+<h3 id="创建数据表"><a href="#创建数据表" class="headerlink" title="创建数据表"></a>创建数据表</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">USE 逻辑库名称;                 # 切换到指定逻辑库</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 数据表(</span><br><span class="line">  列名<span class="number">1</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">  列名<span class="number">2</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">  ......</span><br><span class="line">)[COMMENT<span class="operator">=</span>注释];</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 举例</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> student(</span><br><span class="line">id       <span class="type">INT</span>         UNSIGNED <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">name     <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT</span>      <span class="keyword">NULL</span>,</span><br><span class="line">sex      <span class="type">CHAR</span>(<span class="number">1</span>)     <span class="keyword">NOT</span>      <span class="keyword">NULL</span>,</span><br><span class="line">birthday <span class="type">DATE</span>        <span class="keyword">NOT</span>      <span class="keyword">NULL</span>,</span><br><span class="line">tel      <span class="type">CHAR</span>(<span class="number">11</span>)    <span class="keyword">NOT</span>      <span class="keyword">NULL</span>,</span><br><span class="line">remark   <span class="type">VARCHAR</span>(<span class="number">20</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h4 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 数据表 <span class="keyword">VALUES</span>()</span><br><span class="line"># 举例</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> student <span class="keyword">VALUES</span>(<span class="number">1</span>,&quot;张三&quot;,&quot;男&quot;,&quot;1999-09-09&quot;,&quot;12345678910&quot;,<span class="keyword">NULL</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="数据表的其他操作"><a href="#数据表的其他操作" class="headerlink" title="数据表的其他操作"></a>数据表的其他操作</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> tables;     #展示逻辑库下的所有数据表</span><br><span class="line"><span class="keyword">DESC</span> student;    #展示数据表的详细信息</span><br><span class="line"><span class="keyword">SHOW</span> CARATE <span class="keyword">TABLE</span> student;     #显示创建数据表的<span class="keyword">SQL</span>语句</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h3><h5 id="数字类型"><a href="#数字类型" class="headerlink" title="数字类型"></a>数字类型</h5><table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">大小(字节)</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">TINYINT</td>
+<td align="center">1</td>
+<td align="center">小整数</td>
+</tr>
+<tr>
+<td align="center">SMALLINT</td>
+<td align="center">2</td>
+<td align="center">普通整数</td>
+</tr>
+<tr>
+<td align="center">MEDIUMINT</td>
+<td align="center">3</td>
+<td align="center">普通整数</td>
+</tr>
+<tr>
+<td align="center">INT</td>
+<td align="center">4</td>
+<td align="center">较大整数</td>
+</tr>
+<tr>
+<td align="center">BIGINT</td>
+<td align="center">8</td>
+<td align="center">大整数</td>
+</tr>
+<tr>
+<td align="center">FLOAT</td>
+<td align="center">4</td>
+<td align="center">单精度小数</td>
+</tr>
+<tr>
+<td align="center">DOUBLE</td>
+<td align="center">8</td>
+<td align="center">双精度小数</td>
+</tr>
+<tr>
+<td align="center">DECIMAL</td>
+<td align="center">——-</td>
+<td align="center">DECIMAL(总长度，小数后长度）</td>
+</tr>
+</tbody></table>
+<h5 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h5><table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">大小（字节）</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CHAR</td>
+<td align="center">1-255</td>
+<td align="center">固定长度字符串</td>
+</tr>
+<tr>
+<td align="center">VARCHAR</td>
+<td align="center">1-65535</td>
+<td align="center">不固定长度，不可超过限制长度</td>
+</tr>
+<tr>
+<td align="center">TEXT</td>
+<td align="center">1-65535</td>
+<td align="center">不确定长度</td>
+</tr>
+<tr>
+<td align="center">MEDIUMTEXT</td>
+<td align="center">1-1千6百万</td>
+<td align="center">不确定长度</td>
+</tr>
+<tr>
+<td align="center">LONGTEXT</td>
+<td align="center">1-42亿</td>
+<td align="center">不确定长度</td>
+</tr>
+</tbody></table>
+<h5 id="日期类型"><a href="#日期类型" class="headerlink" title="日期类型"></a>日期类型</h5><table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th>大小（字节）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">DATA</td>
+<td>3</td>
+<td>日期</td>
+</tr>
+<tr>
+<td align="center">TIME</td>
+<td>3</td>
+<td>时间</td>
+</tr>
+<tr>
+<td align="center">TEAR</td>
+<td>1</td>
+<td>年份</td>
+</tr>
+<tr>
+<td align="center">DATETIME</td>
+<td>8</td>
+<td>日期时间</td>
+</tr>
+<tr>
+<td align="center">TIMESTAMP</td>
+<td>4</td>
+<td>时间戳</td>
+</tr>
+</tbody></table>
+<h3 id="数据表添加字段"><a href="#数据表添加字段" class="headerlink" title="数据表添加字段"></a>数据表添加字段</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名称</span><br><span class="line"><span class="keyword">ADD</span> 列<span class="number">1</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line"><span class="keyword">ADD</span> 列名<span class="number">2</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">......;</span><br><span class="line"># 实例</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> student</span><br><span class="line"><span class="keyword">ADD</span> address <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line"><span class="keyword">ADD</span> home_tel <span class="type">CHAR</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="修改字段类型和约束"><a href="#修改字段类型和约束" class="headerlink" title="修改字段类型和约束"></a>修改字段类型和约束</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名称</span><br><span class="line">MODIFY 列<span class="number">1</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">MODIFY 列<span class="number">2</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">......;</span><br><span class="line"># 实例 </span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> student</span><br><span class="line">MODIFY home_tel <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="修改字段名称"><a href="#修改字段名称" class="headerlink" title="修改字段名称"></a>修改字段名称</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名称</span><br><span class="line">CHANGE 列<span class="number">1</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">CHANGE 列<span class="number">2</span> 数据类型 [约束] [COMMENT<span class="operator">=</span>注释],</span><br><span class="line">......;</span><br><span class="line"># 实例</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> student</span><br><span class="line">CHANGE address home_address <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="删除字段"><a href="#删除字段" class="headerlink" title="删除字段"></a>删除字段</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名称</span><br><span class="line"><span class="keyword">DROP</span> 列<span class="number">1</span>,</span><br><span class="line"><span class="keyword">DROP</span> 列<span class="number">2</span>,</span><br><span class="line">......;</span><br><span class="line"># 实例</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> STUDENT</span><br><span class="line"><span class="keyword">DROP</span> home_address,</span><br><span class="line"><span class="keyword">DROP</span> home_tel;</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据库的范式"><a href="#数据库的范式" class="headerlink" title="数据库的范式"></a>数据库的范式</h3><ol>
+<li>原子性：每列都是不可分割的基本数据项；是数据库的基本要求</li>
+<li>唯一性：数据表中每条记录必须是唯一的</li>
+<li>关联性：每个字段都与主键有直接关系，不存在传递依赖</li>
+</ol>
+<h3 id="字段约束"><a href="#字段约束" class="headerlink" title="字段约束"></a>字段约束</h3><table>
+<thead>
+<tr>
+<th align="center">约束名称</th>
+<th align="center">关键字</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">主键约束</td>
+<td align="center">PRIMARY KEY</td>
+<td align="center">字段唯一，不可为空</td>
+</tr>
+<tr>
+<td align="center">非空约束</td>
+<td align="center">NOT NULL</td>
+<td align="center">字段值不为空</td>
+</tr>
+<tr>
+<td align="center">唯一约束</td>
+<td align="center">UNIQUE</td>
+<td align="center">字段值唯一，可为NULL</td>
+</tr>
+<tr>
+<td align="center">外键约束</td>
+<td align="center">FOREIGN KEY</td>
+<td align="center">保证关数据的逻辑性</td>
+</tr>
+</tbody></table>
+<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名称(</span><br><span class="line">	......,</span><br><span class="line">	INDEX [索引名称] (字段),</span><br><span class="line">    ......</span><br><span class="line">);</span><br><span class="line"># 实例</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_message(</span><br><span class="line">    id <span class="type">INT</span> UNSIGNED <span class="keyword">PRIMARY</span> KEY ,</span><br><span class="line">    content <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> ,</span><br><span class="line">    type ENUM(&quot;公告&quot;,&quot;通报&quot;,&quot;个人通知&quot;) <span class="keyword">NOT</span> <span class="keyword">NULL</span> ,</span><br><span class="line">    create_time <span class="type">TIMESTAMP</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> ,</span><br><span class="line">    INDEX idx_type (type)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h3 id="添加索引与删除索引"><a href="#添加索引与删除索引" class="headerlink" title="添加索引与删除索引"></a>添加索引与删除索引</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 添加索引</span><br><span class="line"><span class="keyword">CREATE</span> INDEX 索引名称 <span class="keyword">ON</span> 表名(字段);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名称 <span class="keyword">ADD</span> INDEX [索引名](字段);</span><br><span class="line"># 展示数据表里的所有索引</span><br><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> 表名称;</span><br><span class="line"># 删除索引</span><br><span class="line"><span class="keyword">DROP</span> INDEX 索引名称 <span class="keyword">ON</span> 表名; </span><br></pre></td></tr></table></figure>
+
+<h2 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h2><p>子句的执行顺序</p>
+<p><code>FROM &gt; WHERE &gt; GROUP BY &gt; SELECT &gt; ORDER BY &gt; LIMIT </code></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 查询全部内容</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t_emp;</span><br><span class="line"># 查询指定内容</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,sal <span class="keyword">FROM</span> t_emp;</span><br><span class="line"># 为列名设置别名</span><br><span class="line"><span class="keyword">SELECT</span> empno,sal <span class="operator">*</span><span class="number">12</span> <span class="keyword">AS</span> &quot;INCOME&quot; <span class="keyword">FROM</span> t_emp;</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据分页"><a href="#数据分页" class="headerlink" title="数据分页"></a>数据分页</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ...... <span class="keyword">FROM</span> ...... LIMIT 起始位置,偏移量;</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename <span class="keyword">FROM</span> t_emp LIMIT <span class="number">0</span>,<span class="number">5</span>;</span><br><span class="line"># 简写用法</span><br><span class="line">LIMIT <span class="number">0</span>,<span class="number">5</span> <span class="operator">=</span> LIMIT <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="结果集排序"><a href="#结果集排序" class="headerlink" title="结果集排序"></a>结果集排序</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ......<span class="keyword">FROM</span> ...... <span class="keyword">ORDER</span> <span class="keyword">BY</span> 列名 [<span class="keyword">ASC</span> <span class="operator">|</span> <span class="keyword">DESC</span>];</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,sal,deptno <span class="keyword">FROM</span> t_emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal <span class="keyword">DESC</span>;</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,hiredate <span class="keyword">FROM</span> t_emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> hiredate <span class="keyword">DESC</span> ;</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,sal,hiredate <span class="keyword">FROM</span> t_emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal <span class="keyword">ASC</span> ,hiredate <span class="keyword">DESC</span> ; </span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,sal,deptno <span class="keyword">FROM</span> t_emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal <span class="keyword">DESC</span> LIMIT <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="去除结果集中的重复记录"><a href="#去除结果集中的重复记录" class="headerlink" title="去除结果集中的重复记录"></a>去除结果集中的重复记录</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> 字段 <span class="keyword">FROM</span> ......;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> job <span class="keyword">FROM</span> t_emp;</span><br><span class="line">TIP:只能查询一列数据,只能使用一次</span><br></pre></td></tr></table></figure>
+<h3 id="条件查询"><a href="#条件查询" class="headerlink" title="条件查询"></a>条件查询</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ...... <span class="keyword">FROM</span> ......<span class="keyword">WHERE</span> 条件 [<span class="keyword">AND</span><span class="operator">|</span><span class="keyword">OR</span>] 条件......;</span><br><span class="line"><span class="keyword">SELECT</span> empno,ename,sal <span class="keyword">FROM</span> t_emp <span class="keyword">WHERE</span> (deptno <span class="operator">=</span> <span class="number">10</span> <span class="keyword">OR</span> deptno <span class="operator">=</span> <span class="number">20</span>) <span class="keyword">AND</span> sal <span class="operator">&gt;=</span> <span class="number">2000</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h4><ol>
+<li><p>算术运算符</p>
+<p>加、减、乘、除、求模</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">empno,ename,sal,hiredate</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> deptno <span class="operator">=</span> <span class="number">10</span> <span class="keyword">AND</span> (sal<span class="operator">+</span>IFNULL(<span class="keyword">NULL</span>,<span class="number">0</span>))<span class="operator">*</span><span class="number">12</span> <span class="operator">&gt;=</span><span class="number">15000</span></span><br><span class="line"><span class="keyword">AND</span> DATEDIFF(now(),hiredate)<span class="operator">/</span><span class="number">365</span> <span class="operator">&gt;=</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>比较运算符</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 常见比较运算符</span></span><br><span class="line"><span class="comment">&gt;    &gt;=    &lt;    &lt;=    =    !=    IN(包含)</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    empno,ename,sal,deptno,hiredate</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> deptno <span class="keyword">IN</span> (<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>) <span class="keyword">AND</span> job <span class="operator">!=</span> &quot;SALESMAN&quot;</span><br><span class="line"><span class="keyword">AND</span> hiredate <span class="operator">&lt;</span> &quot;1985-01-01&quot;;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="center">表达式</th>
+<th align="center">意义</th>
+<th align="center">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">IS NULL</td>
+<td align="center">为空</td>
+<td align="center">comm IS NULL</td>
+</tr>
+<tr>
+<td align="center">IS NOT NULL</td>
+<td align="center">不为空</td>
+<td align="center">comm IS NOT NULL</td>
+</tr>
+<tr>
+<td align="center">BETWEEN AND</td>
+<td align="center">范围</td>
+<td align="center">sal BETWEEN 2000 AND 3000</td>
+</tr>
+<tr>
+<td align="center">LIKE</td>
+<td align="center">模糊查询</td>
+<td align="center">ename LIKE “A%”</td>
+</tr>
+<tr>
+<td align="center">REGEXP</td>
+<td align="center">正则表达式</td>
+<td align="center">ename REGEXP “[a-zA-Z]{4}”</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    ename,comm,sal</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> comm <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line"><span class="keyword">And</span> sal <span class="keyword">BETWEEN</span> <span class="number">1000</span> <span class="keyword">AND</span> <span class="number">3000</span></span><br><span class="line">#<span class="keyword">AND</span> ename <span class="keyword">LIKE</span> &quot;%A%&quot;</span><br><span class="line"><span class="keyword">AND</span> ename REGEXP &quot;^[\\u4e00-\\u9fa5]&#123;2,4&#125;$&quot;;</span><br></pre></td></tr></table></figure></li>
+<li><p>逻辑运算符</p>
+<table>
+<thead>
+<tr>
+<th align="center">表达式</th>
+<th align="center">意义</th>
+<th align="center">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">AND</td>
+<td align="center">与</td>
+<td align="center">age &gt;18 AND sex = “男”</td>
+</tr>
+<tr>
+<td align="center">OR</td>
+<td align="center">或</td>
+<td align="center">empno = 8000 OR deptno 20</td>
+</tr>
+<tr>
+<td align="center">NOT</td>
+<td align="center">非</td>
+<td align="center">NOT deptno = 20</td>
+</tr>
+<tr>
+<td align="center">XOR</td>
+<td align="center">异或</td>
+<td align="center">age &gt;18 XOR sex = “男”</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    ename,deptno</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">NOT</span> deptno <span class="keyword">IN</span> (<span class="number">10</span>,<span class="number">20</span>) XOR sal <span class="operator">&gt;=</span><span class="number">2000</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>按位运算符</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">表达式</th>
+<th align="center">意义</th>
+<th align="center">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">&amp;</td>
+<td align="center">与</td>
+<td align="center">3&amp;7</td>
+</tr>
+<tr>
+<td align="center">|</td>
+<td align="center">或</td>
+<td align="center">3|7</td>
+</tr>
+<tr>
+<td align="center">~</td>
+<td align="center">取反</td>
+<td align="center">~10</td>
+</tr>
+<tr>
+<td align="center">^</td>
+<td align="center">异或</td>
+<td align="center">3^7</td>
+</tr>
+<tr>
+<td align="center">&lt;&lt;</td>
+<td align="center">左移</td>
+<td align="center">10&lt;&lt;1</td>
+</tr>
+<tr>
+<td align="center">&gt;&gt;</td>
+<td align="center">右移</td>
+<td align="center">10&gt;&gt;1</td>
+</tr>
+</tbody></table>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><ul>
+<li>SUM函数:用于求和，只用于数字类型，字符结果为0，日期为毫秒数求和 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">SUM</span>(sal) <span class="keyword">FROM</span> t_emp <span class="keyword">WHERE</span> deptno <span class="keyword">IN</span> (<span class="number">10</span>,<span class="number">20</span>);</span><br></pre></td></tr></table></figure></li>
+<li>MAX函数：用于获取非空值的最大值 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MAX</span>(sal<span class="operator">+</span>IFNULL(comm,<span class="number">0</span>)) <span class="keyword">FROM</span> t_emp <span class="keyword">WHERE</span> deptno <span class="keyword">IN</span> (<span class="number">10</span>,<span class="number">20</span>)</span><br></pre></td></tr></table></figure></li>
+<li>MIN函数：用于获取非空值的最小值 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MIN</span>(hiredate) <span class="keyword">FROM</span> t_emp;</span><br></pre></td></tr></table></figure></li>
+<li>AVG函数:统计数据的平均值 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">AVG</span>(sal<span class="operator">+</span>IFNULL(comm,<span class="number">0</span>)) <span class="keyword">AS</span> avg <span class="keyword">FROM</span> t_emp;</span><br></pre></td></tr></table></figure></li>
+<li>COUNT函数:COUNT(*)获得包含空值的记录数，COUNT(列名)用于获得包含非空值的记录数<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> t_emp;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(comm) <span class="keyword">FROM</span> t_emp;</span><br></pre></td></tr></table></figure>
+<h3 id="分组查询"><a href="#分组查询" class="headerlink" title="分组查询"></a>分组查询</h3>GROUP BY子句的作用是通过一定的规则将一盒数据集划分成若干个的小区域，然后针对每个小区域分别进行数据汇总处理<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> deptno,ROUND(<span class="built_in">AVG</span>(sal)) <span class="keyword">FROM</span> t_emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno;</span><br></pre></td></tr></table></figure>
+<h4 id="逐级分组"><a href="#逐级分组" class="headerlink" title="逐级分组"></a>逐级分组</h4>数据库支持多列分组条件，执行的时候逐级分组<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 按照部门与职位分组，显示职位的人数，平均工资，最后按照部门编号升序排列</span><br><span class="line"><span class="keyword">SELECT</span> deptno,job,<span class="built_in">COUNT</span>(<span class="operator">*</span>),ROUND(<span class="built_in">AVG</span>(sal)) <span class="keyword">FROM</span> t_emp  <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno,job <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptno;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>要求：SELECT子句可以包含聚合函数，或者GROUP BY的分组列，其他内容均不可以出现在SELECT子句中</strong></p>
+<h4 id="对分组结果集再次做汇总计算"><a href="#对分组结果集再次做汇总计算" class="headerlink" title="对分组结果集再次做汇总计算"></a>对分组结果集再次做汇总计算</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">deptno,<span class="built_in">COUNT</span>(<span class="operator">*</span>),<span class="built_in">AVG</span>(sal),<span class="built_in">MAX</span>(sal),<span class="built_in">MIN</span>(sal)</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno</span><br><span class="line"><span class="keyword">WITH</span> <span class="keyword">ROLLUP</span> ;</span><br></pre></td></tr></table></figure>
+<h4 id="GROUP-CONCAT函数"><a href="#GROUP-CONCAT函数" class="headerlink" title="GROUP_CONCAT函数"></a>GROUP_CONCAT函数</h4><p>把分组查询中的某个字段拼接成一个字符串</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> deptno,<span class="built_in">COUNT</span>(<span class="operator">*</span>),GROUP_CONCAT(ename)</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> sal<span class="operator">&gt;</span><span class="number">2000</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno</span><br></pre></td></tr></table></figure>
+<h3 id="Having-子句"><a href="#Having-子句" class="headerlink" title="Having 子句"></a>Having 子句</h3><p>类似于WHENE子句，在分组执行后执行</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> deptno <span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> hiredate <span class="operator">&gt;=</span> <span class="string">&#x27;1982-01-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="表连接"><a href="#表连接" class="headerlink" title="表连接"></a>表连接</h3><p>内连接是常见的一种表连接，用于查询多张关系表符合连接条件的记录;</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">语法：<span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> 表<span class="number">1</span> [<span class="keyword">INNER</span>] <span class="keyword">JOIN</span> 表<span class="number">2</span> <span class="keyword">ON</span> 条件 ...</span><br><span class="line">    <span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> 表<span class="number">1</span> <span class="keyword">JOIN</span> 表<span class="number">2</span> <span class="keyword">WHERE</span> 条件...</span><br><span class="line">    <span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> 表<span class="number">1</span>,表<span class="number">2</span> <span class="keyword">WHERE</span> 条件 ...</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">SELECT</span> e.empno,e.ename,d.dname,e.sal,e.job,s.grade</span><br><span class="line">    <span class="keyword">FROM</span> t_emp e <span class="keyword">JOIN</span> t_dept d <span class="keyword">ON</span> e.deptno <span class="operator">=</span> d.deptno</span><br><span class="line">    <span class="keyword">JOIN</span> t_salgrade s <span class="keyword">ON</span> e.sal <span class="keyword">BETWEEN</span> s.losal <span class="keyword">AND</span> s.hisal;</span><br></pre></td></tr></table></figure>
+<p>外连接：除了符合条件的记录之外，结果集中还会保留不符合条件的记录<br>左连接与右连接：左外连接就是保留左表所有的记录,与右表做连接。如果右表有符合条件的记录就与左表连接。如果右表没有符合条件的记录,就用 NULL 与左表连接。右外连接也是如此。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> e.empno,e.ename,d.dname</span><br><span class="line"><span class="keyword">FROM</span> t_emp e <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> t_dept d</span><br><span class="line"><span class="keyword">ON</span> E.deptno <span class="operator">=</span> d.deptno</span><br></pre></td></tr></table></figure>
+<p>UNION 关键字可以将多个查询语句的结果集进行合并 要求：字段个数相同，字段名称相同</p>
+<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><p>子查询是一种查询中嵌套查询的语句<br>子查询可以写在三个地方：WHERE子句、FROM子句、SELECT子句。<br>WHERE 子查询最简单，最容易理解，但是效率是最低的</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># <span class="keyword">WHERE</span>子查询 （不推荐使用）</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">empno,ename,sal</span><br><span class="line"><span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> sal<span class="operator">&gt;=</span>(<span class="keyword">SELECT</span> <span class="built_in">AVG</span>(sal) <span class="keyword">FROM</span> t_emp);</span><br></pre></td></tr></table></figure>
+<p>FROM 子查询只会执行一次，效率很高</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">e.empno,e.ename,e.sal,e.deptno</span><br><span class="line"><span class="keyword">FROM</span> t_emp e <span class="keyword">JOIN</span></span><br><span class="line">(<span class="keyword">SELECT</span> deptno,<span class="built_in">AVG</span>(sal) <span class="keyword">AS</span> avg <span class="keyword">FROM</span> t_emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno) t</span><br><span class="line"><span class="keyword">WHERE</span> e.deptno <span class="operator">=</span> t.deptno <span class="keyword">AND</span> e.sal <span class="operator">&gt;</span> t.avg;</span><br></pre></td></tr></table></figure>
+<p>SELECT 子查询:每输出一条记录就要执行一次，查询效率很低</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">e.empno,e.ename,</span><br><span class="line">       (<span class="keyword">SELECT</span> dname <span class="keyword">FROM</span> t_dept <span class="keyword">WHERE</span> deptno <span class="operator">=</span> e.deptno)</span><br><span class="line"><span class="keyword">FROM</span> t_emp e;</span><br></pre></td></tr></table></figure>
+<p>单行子查询和多行子查询<br>WHERE子句中，可以使用IN,ALL,ANY,EXISTS关键字来处理多行表达式结果集的条件判断</p>
+<p>INSERT 语句:插入数据</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 语法:<span class="keyword">INSERT</span> <span class="keyword">INTO</span> 表名(字段<span class="number">1</span>，字段<span class="number">2.</span>..)</span><br><span class="line">#<span class="keyword">VALUES</span> (值<span class="number">1</span>,值<span class="number">2.</span>..),(值<span class="number">1</span>,值<span class="number">2.</span>..)...;</span><br><span class="line"># MYSQL 的方言</span><br><span class="line"># <span class="keyword">INSERT</span> [<span class="keyword">INTO</span>] 表名 <span class="keyword">SET</span> 字段<span class="number">1</span><span class="operator">=</span>值<span class="number">1</span>,字段<span class="number">2</span><span class="operator">=</span>值<span class="number">2</span>,...;</span><br><span class="line"># IGNORE 关键字:只插入数据库不存在的部分。</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptno, dname, loc)</span><br><span class="line"><span class="keyword">VALUE</span> (<span class="number">60</span>,<span class="string">&#x27;后勤部&#x27;</span>,<span class="string">&#x27;北京&#x27;</span>),(<span class="number">70</span>,<span class="string">&#x27;保安部&#x27;</span>,<span class="string">&#x27;北京&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp (empno, ename, job, mgr, hiredate, sal, comm, deptno)</span><br><span class="line"><span class="keyword">VALUE</span>(<span class="number">8001</span>,<span class="string">&#x27;刘娜&#x27;</span>,<span class="string">&#x27;SALESMAN&#x27;</span>,<span class="number">8000</span>,<span class="string">&#x27;1988-12-20&#x27;</span>,<span class="number">2000</span>,<span class="keyword">NULL</span>,</span><br><span class="line">     (<span class="keyword">SELECT</span> deptno <span class="keyword">FROM</span> t_dept <span class="keyword">WHERE</span> dname<span class="operator">=</span><span class="string">&#x27;技术部&#x27;</span>)) ;</span><br></pre></td></tr></table></figure>
+
+<p>UPDATE语句:修改表的记录</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">UPDATE [IGNORE] 表名</span><br><span class="line"><span class="keyword">SET</span> 字段<span class="number">1</span><span class="operator">=</span>值<span class="number">1</span>,字段<span class="number">2</span><span class="operator">=</span>值<span class="number">2</span>,......</span><br><span class="line">[<span class="keyword">WHERE</span> 条件<span class="number">1</span> .....]</span><br><span class="line">[<span class="keyword">ORDER</span> <span class="keyword">BY</span> ......]</span><br><span class="line">[LIMIT ...... ]</span><br><span class="line">UPDATE t_emp</span><br><span class="line"><span class="keyword">SET</span> empno <span class="operator">=</span> empno <span class="operator">+</span> <span class="number">1</span> ,mgr <span class="operator">=</span> mgr <span class="operator">+</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> empno <span class="keyword">DESC</span> ;</span><br><span class="line"></span><br><span class="line">UPDATE t_emp</span><br><span class="line"><span class="keyword">SET</span> sal <span class="operator">=</span> sal <span class="operator">-</span> <span class="number">100</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> sal <span class="operator">+</span> IFNULL(comm,<span class="number">0</span>) <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">UPDATE t_emp e <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> t_dept d <span class="keyword">ON</span> e.deptno <span class="operator">=</span> d.deptno</span><br><span class="line"><span class="keyword">SET</span> e.deptno <span class="operator">=</span><span class="number">20</span></span><br><span class="line"><span class="keyword">WHERE</span> e.deptno <span class="keyword">IS</span> <span class="keyword">NULL</span> <span class="keyword">OR</span> (d.dname<span class="operator">=</span> <span class="string">&#x27;SALES&#x27;</span> <span class="keyword">AND</span> e.sal <span class="operator">&lt;</span> <span class="number">2000</span>);</span><br></pre></td></tr></table></figure>
+<p>DELETE 语句:删除记录</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> [IGNORE] 表名</span><br><span class="line"><span class="keyword">SET</span> 字段<span class="number">1</span><span class="operator">=</span>值<span class="number">1</span>,字段<span class="number">2</span><span class="operator">=</span>值<span class="number">2</span>,......</span><br><span class="line">[<span class="keyword">WHERE</span> 条件<span class="number">1</span> .....]</span><br><span class="line">[<span class="keyword">ORDER</span> <span class="keyword">BY</span> ......]</span><br><span class="line">[LIMIT ...... ]</span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> t_emp</span><br><span class="line"><span class="keyword">WHERE</span> deptno <span class="operator">=</span> <span class="number">20</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> sal<span class="operator">+</span>IFNULL(comm,<span class="number">0</span>)</span><br><span class="line">LIMIT <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">DELETE</span> e ,d</span><br><span class="line"><span class="keyword">FROM</span> t_emp e <span class="keyword">JOIN</span> t_dept d <span class="keyword">ON</span> e.deptno <span class="operator">=</span> d.deptno</span><br><span class="line"><span class="keyword">WHERE</span> d.dname <span class="operator">=</span> <span class="string">&#x27;SALES&#x27;</span> ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">DELETE</span> e</span><br><span class="line"><span class="keyword">FROM</span> t_emp e <span class="keyword">JOIN</span> (<span class="keyword">SELECT</span> <span class="built_in">AVG</span>(sal) <span class="keyword">AS</span> avg <span class="keyword">FROM</span> t_emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno) t <span class="keyword">ON</span> e.sal <span class="operator">&lt;</span> t.avg;</span><br></pre></td></tr></table></figure>
+<h4 id="快速删除表里记录"><a href="#快速删除表里记录" class="headerlink" title="快速删除表里记录"></a>快速删除表里记录</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span> t_emp</span><br></pre></td></tr></table></figure>
+<h3 id="函数的使用"><a href="#函数的使用" class="headerlink" title="函数的使用"></a>函数的使用</h3><ul>
+<li>数字函数<table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">功能</th>
+<th align="center">用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ABS</td>
+<td align="center">绝对值</td>
+<td align="center">用例</td>
+</tr>
+<tr>
+<td align="center">ROUND</td>
+<td align="center">四舍五入</td>
+<td align="center">ROUND(4.62)</td>
+</tr>
+<tr>
+<td align="center">FLOOR</td>
+<td align="center">强制舍位</td>
+<td align="center">FLOOR(9.9)</td>
+</tr>
+<tr>
+<td align="center">CEIL</td>
+<td align="center">强制进位</td>
+<td align="center">CEIL(3.2)</td>
+</tr>
+<tr>
+<td align="center">POWER</td>
+<td align="center">幂函数</td>
+<td align="center">POWER(2,3)</td>
+</tr>
+<tr>
+<td align="center">LOG</td>
+<td align="center">对数函数</td>
+<td align="center">LOG(7,3)</td>
+</tr>
+<tr>
+<td align="center">LN</td>
+<td align="center">对数函数</td>
+<td align="center">LN(10)</td>
+</tr>
+<tr>
+<td align="center">SQRT</td>
+<td align="center">开平方</td>
+<td align="center">SQRT(9)</td>
+</tr>
+<tr>
+<td align="center">PI</td>
+<td align="center">圆周率</td>
+<td align="center">PI()</td>
+</tr>
+<tr>
+<td align="center">SIN</td>
+<td align="center">三角函数</td>
+<td align="center">SIN(1)</td>
+</tr>
+<tr>
+<td align="center">COS</td>
+<td align="center">三角函数</td>
+<td align="center">COS(1)</td>
+</tr>
+<tr>
+<td align="center">TAN</td>
+<td align="center">三角函数</td>
+<td align="center">TAN(1)</td>
+</tr>
+<tr>
+<td align="center">COT</td>
+<td align="center">三角函数</td>
+<td align="center">COT(1)</td>
+</tr>
+<tr>
+<td align="center">RADIANS</td>
+<td align="center">角度转弧度</td>
+<td align="center">RADIANS(30)</td>
+</tr>
+<tr>
+<td align="center">DEGREES</td>
+<td align="center">弧度转角度</td>
+<td align="center">DEGREES(1)</td>
+</tr>
+</tbody></table>
+</li>
+<li>字符函数<table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">功能</th>
+<th align="center">用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">LOWER</td>
+<td align="center">转小写字符</td>
+<td align="center">LOWER(eNAME)</td>
+</tr>
+<tr>
+<td align="center">UPPER</td>
+<td align="center">转大写字符</td>
+<td align="center">UPPER(HIOIO)</td>
+</tr>
+<tr>
+<td align="center">LENGTH</td>
+<td align="center">字符数量</td>
+<td align="center">LENGTH(XGHSG)</td>
+</tr>
+<tr>
+<td align="center">CONCAT</td>
+<td align="center">连接字符串</td>
+<td align="center">CONCAT(SAL,’%’)</td>
+</tr>
+<tr>
+<td align="center">INSTR</td>
+<td align="center">字符出现的位置</td>
+<td align="center">INSRT(ename,’A’)</td>
+</tr>
+<tr>
+<td align="center">INSRET</td>
+<td align="center">插入/替换字符串</td>
+<td align="center">INSRET(‘你好’,1,0,’先生’)</td>
+</tr>
+<tr>
+<td align="center">REPLACE</td>
+<td align="center">替换字符</td>
+<td align="center">REPLACE(‘你好先生’,’先生’,’女士’)</td>
+</tr>
+<tr>
+<td align="center">SUBSTR</td>
+<td align="center">截取字符串</td>
+<td align="center">SUBSTR(‘你好世界’，3,4)</td>
+</tr>
+<tr>
+<td align="center">SUBSTRING</td>
+<td align="center">截取字符串</td>
+<td align="center">SUBSTRING(‘你好世界’，3,2)</td>
+</tr>
+<tr>
+<td align="center">LPAD</td>
+<td align="center">左侧填充字符</td>
+<td align="center">LPAD(‘Hello’，10，’*’)</td>
+</tr>
+<tr>
+<td align="center">RPAD</td>
+<td align="center">右侧填充字符</td>
+<td align="center">RPAD(‘Hello’，10，’*’)</td>
+</tr>
+<tr>
+<td align="center">TRIM</td>
+<td align="center">去除首尾空格</td>
+<td align="center">TRIM(‘ 你好先生 ‘)</td>
+</tr>
+</tbody></table>
+</li>
+<li>日期函数<ul>
+<li>NOW():获得系统日期和时间，格式: yyyy-MM-dd hh:mm:ss</li>
+<li>CURDATE():获得当前系统日期，格式:yyyy-MM-dd</li>
+<li>CURTIMR():获得当前系统的时间，格式:hh:mm:ss</li>
+<li>DATE_FORMAT(日期，表达式)：格式化日期，返回指定的日期格式</li>
+<li>DATE_ADD(日期，偏移量):时间偏移函数，后正前负</li>
+<li>DATEDIFF(日期，日期)：计算日期的差值的天数</li>
+</ul>
+</li>
+<li>条件函数<ul>
+<li>IFNULL(表达式,值)</li>
+<li>IF(表达式，值1，值2)</li>
+<li>```sql<br>CASE<br>  WHEN 表达式 THEN 值1<br>  WHEN 表达式 THEN 值2<br>  ……<br>  ELSE 值N<br>END<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">## 事务机制</span><br><span class="line">使用redo日志和undo日志文件</span><br><span class="line">&#96;&#96;&#96;sql</span><br><span class="line">START TRANSACTION ;      # 开启事务机制</span><br><span class="line">COMMIT ;                 # 提交</span><br><span class="line">ROLLBACK ;               # 回滚</span><br></pre></td></tr></table></figure>
+事务的ACID属性</li>
+</ul>
+</li>
+<li>原子性:所有操作只有2种状态，成功失败。不许停留在中间某个状态</li>
+<li>一致性:事务必须保证运行结果一致性</li>
+<li>隔离性:每个事务不受其他并发事务的影响</li>
+<li>持久性:一旦提交，便是永久的</li>
+</ul>
+<p>事务的四个隔离级别<br>| 序号 | 隔离级别 | 功能 |<br>| :—: | :—: | :—: |<br>| 1 | read uncommitted | 读取未提交数据(买票) |<br>| 2 | read committed | 读取已提交数据(银行) |<br>| 3 | repeatable read | 重复读取(电商) |<br>| 4 | serializable | 序列化<br>|</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 修改事务隔离级别</span><br><span class="line"><span class="keyword">SET</span> SESSION TRANSACTION ISOLATION LEVEL <span class="operator">*</span><span class="operator">*</span><span class="operator">*</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>study</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>docker</title>
     <url>/2021/04/23/docker/</url>
-    <content><![CDATA[<h2 id="Docker的安装与卸载"><a href="#Docker的安装与卸载" class="headerlink" title="Docker的安装与卸载"></a>Docker的安装与卸载</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">`Docker的安装`</span><br><span class="line"><span class="meta">#</span><span class="bash"> 1、卸载旧版本</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get remove docker docker-engine docker.io containerd runc</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2、需要的安装依赖</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install \</span></span><br><span class="line"><span class="bash">    apt-transport-https \</span></span><br><span class="line"><span class="bash">    ca-certificates \</span></span><br><span class="line"><span class="bash">    curl \</span></span><br><span class="line"><span class="bash">    gnupg-agent \</span></span><br><span class="line"><span class="bash">    software-properties-common</span></span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h2 id="Docker的安装与卸载"><a href="#Docker的安装与卸载" class="headerlink" title="Docker的安装与卸载"></a>Docker的安装与卸载</h2><p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。<br>Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。<br>容器是完全使用沙箱机制，相互之间不会有任何接口（类似 iPhone 的 app）,更重要的是容器性能开销极低。</p>
 <span id="more"></span>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 3、添加官方密钥</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-key fingerprint 0EBFCD88</span></span><br><span class="line">pub   rsa4096 2017-02-22 [SCEA]</span><br><span class="line">      9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88</span><br><span class="line">uid           [ 未知 ] Docker Release (CE deb) &lt;docker@docker.com&gt;</span><br><span class="line">sub   rsa4096 2017-02-22 [S]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 4、 设置镜像仓库</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo add-apt-repository \</span></span><br><span class="line"><span class="bash">   <span class="string">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \</span></span></span><br><span class="line"><span class="bash">   $(lsb_release -cs) \</span></span><br><span class="line"><span class="bash">   stable<span class="string">&quot;                       # 官方国外源</span></span></span><br><span class="line">   </span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo add-apt-repository \</span></span><br><span class="line"><span class="bash">   <span class="string">&quot;deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu \</span></span></span><br><span class="line"><span class="bash">   $(lsb_release -cs) \</span></span><br><span class="line"><span class="bash">   stable<span class="string">&quot;                     # 阿里源</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 5、安装docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install docker-ce docker-ce-cli containerd.io</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 6、启动docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> service docker start</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 7、测试 hello-world  == 验证安装成功</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo docker run hello-world</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">8、查看下载的hello world</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo docker images</span></span><br><span class="line">REPOSITORY    TAG       IMAGE ID       CREATED         SIZE</span><br><span class="line">hello-world   latest    bf756fb1ae65   12 months ago   13.3kB</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">`Docker的安装`</span><br><span class="line"><span class="meta">#</span><span class="bash"> 1、卸载旧版本</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get remove docker docker-engine docker.io containerd runc</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2、需要的安装依赖</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install \</span></span><br><span class="line"><span class="bash">    apt-transport-https \</span></span><br><span class="line"><span class="bash">    ca-certificates \</span></span><br><span class="line"><span class="bash">    curl \</span></span><br><span class="line"><span class="bash">    gnupg-agent \</span></span><br><span class="line"><span class="bash">    software-properties-common</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3、添加官方密钥</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-key fingerprint 0EBFCD88</span></span><br><span class="line">pub   rsa4096 2017-02-22 [SCEA]</span><br><span class="line">      9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88</span><br><span class="line">uid           [ 未知 ] Docker Release (CE deb) &lt;docker@docker.com&gt;</span><br><span class="line">sub   rsa4096 2017-02-22 [S]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 4、 设置镜像仓库</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo add-apt-repository \</span></span><br><span class="line"><span class="bash">   <span class="string">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \</span></span></span><br><span class="line"><span class="bash">   $(lsb_release -cs) \</span></span><br><span class="line"><span class="bash">   stable<span class="string">&quot;                       # 官方国外源</span></span></span><br><span class="line">   </span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo add-apt-repository \</span></span><br><span class="line"><span class="bash">   <span class="string">&quot;deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu \</span></span></span><br><span class="line"><span class="bash">   $(lsb_release -cs) \</span></span><br><span class="line"><span class="bash">   stable<span class="string">&quot;                     # 阿里源</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 5、安装docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install docker-ce docker-ce-cli containerd.io</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 6、启动docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> service docker start</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 7、测试 hello-world  == 验证安装成功</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo docker run hello-world</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">8、查看下载的hello world</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo docker images</span></span><br><span class="line">REPOSITORY    TAG       IMAGE ID       CREATED         SIZE</span><br><span class="line">hello-world   latest    bf756fb1ae65   12 months ago   13.3kB</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">`Docker的卸载`</span><br><span class="line"><span class="meta">#</span><span class="bash"> 1、卸载依赖</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get purge docker-ce docker-ce-cli containerd.io</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">2、删除目录</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo rm -rf /var/lib/docker</span></span><br></pre></td></tr></table></figure>
 
@@ -57,24 +796,5 @@
         <tag>study</tag>
         <tag>工具</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2021/04/22/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<span id="more"></span>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
 </search>

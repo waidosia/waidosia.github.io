@@ -2,9 +2,58 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://250220.xyz/2021/05/16/redis/</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/2021/05/16/mysql/</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/2021/05/16/mongodb/</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/2021/05/16/git/</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/about/index.html</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/tags/index.html</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/categories/index.html</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://250220.xyz/2021/04/23/docker/</loc>
     
-    <lastmod>2021-05-14</lastmod>
+    <lastmod>2021-05-16</lastmod>
     
   </url>
   
@@ -12,34 +61,6 @@
     <loc>https://250220.xyz/life/index.html</loc>
     
     <lastmod>2021-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://250220.xyz/categories/index.html</loc>
-    
-    <lastmod>2021-05-04</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://250220.xyz/tags/index.html</loc>
-    
-    <lastmod>2021-05-04</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://250220.xyz/2021/04/22/hello-world/</loc>
-    
-    <lastmod>2021-04-26</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://250220.xyz/about/index.html</loc>
-    
-    <lastmod>2021-04-26</lastmod>
     
   </url>
   
@@ -67,6 +88,13 @@
   </url>
   
 
+  
+  <url>
+    <loc>https://250220.xyz/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    <lastmod>2021-05-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
   
   <url>
     <loc>https://250220.xyz/categories/%E7%BC%96%E7%A8%8B/</loc>
