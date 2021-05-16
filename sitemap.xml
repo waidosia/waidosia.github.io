@@ -2,7 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://250220.xyz/2021/05/16/mongodb/</loc>
+    <loc>https://250220.xyz/2021/04/23/docker/</loc>
+    
+    <lastmod>2021-05-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/2021/05/16/git/</loc>
     
     <lastmod>2021-05-16</lastmod>
     
@@ -23,14 +30,7 @@
   </url>
   
   <url>
-    <loc>https://250220.xyz/2021/04/23/docker/</loc>
-    
-    <lastmod>2021-05-16</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://250220.xyz/2021/05/16/git/</loc>
+    <loc>https://250220.xyz/2021/05/16/mongodb/</loc>
     
     <lastmod>2021-05-16</lastmod>
     
