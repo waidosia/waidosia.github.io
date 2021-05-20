@@ -2,6 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://250220.xyz/gallery.json</loc>
+    
+    <lastmod>2021-05-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/life/%E5%81%87%E6%9C%9F/index.html</loc>
+    
+    <lastmod>2021-05-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://250220.xyz/life/%E6%97%A5%E5%B8%B8/index.html</loc>
+    
+    <lastmod>2021-05-20</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://250220.xyz/life/index.html</loc>
     
     <lastmod>2021-05-20</lastmod>
